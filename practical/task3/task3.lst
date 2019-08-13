@@ -1,0 +1,99 @@
+     1                                 %line 1+1 task3.asm
+     2                                  SYS_EXIT equ 1
+     3                                  SYS_READ equ 3
+     4                                  SYS_WRITE equ 4
+     5                                  STDIN equ 0
+     6                                  STDOUT equ 1
+     7                                 
+     8                                 [segment .data]
+     9                                 
+    10 00000000 506C6561736520696E-     msg db "Please input the first number: "
+    11 00000000 707574207468652066-
+    12 00000000 69727374206E756D62-
+    13 00000000 65723A20           
+    14                                  len equ $- msg
+    15 0000001F 0A                      endl: db "",0x0a
+    16                                 
+    17                                 [segment .bss]
+    18                                 
+    19 00000000 <gap>                   number1 resb 2
+    20 00000002 <gap>                   number2 resb 2
+    21 00000004 <gap>                   result resb 1
+    22                                 
+    23                                 [segment .text]
+    24                                 
+    25 00000000 506C6561736520696E-     msg2 db "Please input the second number: "
+    26 00000000 707574207468652073-
+    27 00000000 65636F6E64206E756D-
+    28 00000000 6265723A20         
+    29                                  len2 equ $- msg2
+    30                                 
+    31                                  len3 equ $- msg3
+    32                                 
+    33                                 [global _start]
+    34                                 
+    35                                  _start:
+    36                                 
+    37 00000020 B804000000              mov eax, SYS_WRITE
+    38 00000025 BB01000000              mov ebx, STDOUT
+    39 0000002A B9[00000000]            mov ecx, msg
+    40 0000002F BA1F000000              mov edx, len
+    41 00000034 CD80                    int 0x80
+    42                                 
+    43 00000036 B803000000              mov eax, SYS_READ
+    44 0000003B BB00000000              mov ebx, STDIN
+    45 00000040 B9[00000000]            mov ecx, number1
+    46 00000045 BA02000000              mov edx, 2
+    47 0000004A CD80                    int 0x80
+    48                                 
+    49 0000004C B804000000              mov eax, SYS_WRITE
+    50 00000051 BB01000000              mov ebx, STDOUT
+    51 00000056 B9[00000000]            mov ecx, msg2
+    52 0000005B BA20000000              mov edx, len2
+    53 00000060 CD80                    int 0x80
+    54                                 
+    55 00000062 B803000000              mov eax, SYS_READ
+    56 00000067 BB00000000              mov ebx, STDIN
+    57 0000006C B9[00000000]            mov ecx, number2
+    58 00000071 BA02000000              mov edx, 2
+    59 00000076 CD80                    int 0x80
+    60                                 
+    61 00000078 B804000000              mov eax, SYS_WRITE
+    62 0000007D BB01000000              mov ebx, STDOUT
+    63 00000082 B9[00000000]            mov ecx, msg3
+    64 00000087 BA00000000              mov edx, len3
+    65 0000008C CD80                    int 0x80
+    66                                 
+    67                                 
+    68 0000008E 8B0425[00000000]        mov eax, [number1]
+    69 00000095 83E830                  sub eax, '0'
+    70                                 
+    71 00000098 8B1C25[00000000]        mov ebx, [number2]
+    72 0000009F 83EB30                  sub ebx, '0'
+    73                                 
+    74                                 
+    75 000000A2 01D8                    add eax, ebx
+    76                                 
+    77 000000A4 83C030                  add eax, '0'
+    78                                 
+    79                                 
+    80 000000A7 890425[00000000]        mov [result], eax
+    81                                 
+    82                                 
+    83 000000AE B804000000              mov eax, SYS_WRITE
+    84 000000B3 BB01000000              mov ebx, STDOUT
+    85 000000B8 B9[00000000]            mov ecx, result
+    86 000000BD BA01000000              mov edx, 1
+    87 000000C2 CD80                    int 0x80
+    88                                 
+    89 000000C4 B801000000              mov eax,1
+    90 000000C9 BF01000000              mov edi,1
+    91 000000CE BA01000000              mov edx, 1
+    92 000000D3 488D3425[00000000]      lea rsi,[endl]
+    93 000000DB 0F05                    syscall
+    94                                 
+    95                                 
+    96                                 exit:
+    97 000000DD B801000000              mov eax, SYS_EXIT
+    98 000000E2 31DB                    xor ebx, ebx
+    99 000000E4 CD80                    int 0x80
