@@ -1,10 +1,10 @@
 make: go
 
-div.o:  div.asm
-		yasm -f elf64 -g dwarf2 -l div.lst div.asm
+decoder.o:  decoder.asm
+		yasm -f elf64 -g dwarf2 -l decoder.lst decoder.asm
 
-go:   div.o
-		ld -o div div.o
+go:   decoder.o
+		ld -o decoder decoder.o
 
 run: 
-		./div <input> output
+		./decoder

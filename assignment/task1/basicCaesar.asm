@@ -1,48 +1,65 @@
 segment .data
-      init:	db "Please input an integer: ",0x0a
-      msg: 	db "The total sum is: ",0x0a
+      shiftmsg:	db "Please input the shift degree: ",0x0a
+      inptmsg: 	db "Please input the string to encode: ",0x0a
+	  outptmsg: 	db "Encoded text:  ",0x0a
       endl: db "",0x0a
 segment .bss
     res1: resb 10
-	inpt: resb 10
+	inpt: resb 100
+	shiftdegree: resb 10
+	dshiftdegree: resb 10
 	out1: resb 1
 	buffer: resb 20
 segment .text
 	global _start
 _start:
-	;INITIAL MESSAGE
+	;SHIFT MESSAGE
 	mov eax,1
 	mov edi,1
-	mov edx, 25
-	lea rsi,[init]
+	mov edx, 31
+	lea rsi,[shiftmsg]
 	syscall
 
 	;GET INPUT NUMBER
 	mov eax,0
 	mov edi,0
-	mov edx, 200
+	mov edx, 3
+	lea rsi,[shiftdegree]
+	syscall
+
+	;INPT REQEUST MESSAGE
+	mov eax,1
+	mov edi,1
+	mov edx, 35
+	lea rsi,[inptmsg]
+	syscall
+
+	;GET MESSAGE NUMBER
+	mov eax,0
+	mov edi,0
+	mov edx, 2000
 	lea rsi,[inpt]
 	syscall
 
-	;PRE-CALCULATION MESSAGE
+	;PRE-SHIFT MESSAGE
 	mov eax,1
 	mov edi,1
-	mov edx, 18
-	lea rsi,[msg]
+	mov edx, 14
+	lea rsi, [outptmsg]
 	syscall
 
-	;CALCULATION STARTS
+;SPLIT DEGREE TO DECIMAL
 
 	;ASCII input -> Decimal Value
 	xor r15, r15 ; counter
 	xor r11, r11 ; interm value
 	xor r10, r10 ; final value
 a2d:
-	cmp byte[inpt+r15], 0    ; check for end of string
+	cmp byte[shiftdegree+r15], 10    ; check for end of string
 	je a2dend
 
 	mov eax, 0                      ; empty eax
-	mov al, byte[inpt+r15]      ; move string position into al
+	mov al, byte[shiftdegree+r15]      ; move string position into al
 
 	sub al, '0'
 	imul r10, 10
@@ -51,6 +68,55 @@ a2d:
 	add r15, 1
 	jmp a2d
 a2dend:
+
+	mov [dshiftdegree], r10;
+
+	xor r15, r15 ; counter
+	xor r14, r14
+shiftloop:
+	cmp byte[inpt+r15], 10    ; check for end of string
+	je shiftloopend
+
+	mov r14, 0                      ; empty eax
+	mov r14b, byte[inpt+r15]      ; move string position into al
+
+	cmp r14b, ' '
+	jnz shiftit
+
+	mov [out1], r14b
+	mov eax,1
+	mov edi,1
+	mov edx, 1
+	lea rsi, [out1]
+	syscall
+	jmp skipwhitespace
+
+shiftit:
+
+	add r14, [dshiftdegree]
+
+	cmp r14, 'z'
+	jle underz
+
+	sub r14, 26
+
+underz:
+	mov [out1], r14
+
+	mov eax,1
+	mov edi,1
+	mov edx, 1
+	lea rsi, [out1]
+	syscall
+
+skipwhitespace:
+	add r15, 1
+	jmp shiftloop
+shiftloopend:
+
+
+	jmp skipo
+
 
 
 	xor rax, rax
@@ -153,13 +219,7 @@ outloop:
 	jmp outloop
 outloopend:
 
-	add r12, '0'
-	mov [res1], r12
-	mov eax,1
-	mov edi,1
-	mov edx, 1
-	lea rsi, [res1]
-	syscall
+skipo:
 
 	;ENDL
 	mov eax,1

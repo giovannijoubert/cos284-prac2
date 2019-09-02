@@ -1,10 +1,10 @@
 make: go
 
-sub.o:  sub.asm
-		yasm -f elf64 -g dwarf2 -l sub.lst sub.asm
+complexCaesar.o:  complexCaesar.asm
+		yasm -f elf64 -g dwarf2 -l complexCaesar.lst complexCaesar.asm
 
-go:   sub.o
-		ld -o sub sub.o
+go:   complexCaesar.o
+		ld -o complexCaesar complexCaesar.o
 
 run: 
-		./sub 
+		./complexCaesar

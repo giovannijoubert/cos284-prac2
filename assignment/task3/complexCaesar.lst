@@ -1,0 +1,351 @@
+     1                                 %line 1+1 complexCaesar.asm
+     2                                 [segment .data]
+     3 00000000 506C6561736520696E-     shiftmsg: db "Please input the shift degree: ",0x0a
+     4 00000000 707574207468652073-
+     5 00000000 686966742064656772-
+     6 00000000 65653A200A         
+     7 00000020 506C6561736520696E-     inptmsg: db "Please input the string to encode: ",0x0a
+     8 00000020 707574207468652073-
+     9 00000020 7472696E6720746F20-
+    10 00000020 656E636F64653A200A 
+    11 00000044 456E636F6465642074-     outptmsg: db "Encoded text:  ",0x0a
+    12 00000044 6578743A20200A     
+    13 00000054 0A                      endl: db "",0x0a
+    14                                 [segment .bss]
+    15 00000000 <gap>                   res1: resb 10
+    16 0000000A <gap>                   inpt: resb 100
+    17 0000006E <gap>                   shiftdegree: resb 10
+    18 00000078 <gap>                   dshiftdegree: resb 10
+    19 00000082 <gap>                   out1: resb 1
+    20 00000083 <gap>                   buffer: resb 20
+    21                                 [segment .text]
+    22                                 [global _start]
+    23                                 _start:
+    24                                 
+    25 00000000 B801000000              mov eax,1
+    26 00000005 BF01000000              mov edi,1
+    27 0000000A BA1F000000              mov edx, 31
+    28 0000000F 488D3425[00000000]      lea rsi,[shiftmsg]
+    29 00000017 0F05                    syscall
+    30                                 
+    31                                 
+    32 00000019 B800000000              mov eax,0
+    33 0000001E BF00000000              mov edi,0
+    34 00000023 BA03000000              mov edx, 3
+    35 00000028 488D3425[00000000]      lea rsi,[shiftdegree]
+    36 00000030 0F05                    syscall
+    37                                 
+    38                                 
+    39 00000032 B801000000              mov eax,1
+    40 00000037 BF01000000              mov edi,1
+    41 0000003C BA23000000              mov edx, 35
+    42 00000041 488D3425[00000000]      lea rsi,[inptmsg]
+    43 00000049 0F05                    syscall
+    44                                 
+    45                                 
+    46 0000004B B800000000              mov eax,0
+    47 00000050 BF00000000              mov edi,0
+    48 00000055 BAD0070000              mov edx, 2000
+    49 0000005A 488D3425[00000000]      lea rsi,[inpt]
+    50 00000062 0F05                    syscall
+    51                                 
+    52                                 
+    53 00000064 B801000000              mov eax,1
+    54 00000069 BF01000000              mov edi,1
+    55 0000006E BA0E000000              mov edx, 14
+    56 00000073 488D3425[00000000]      lea rsi, [outptmsg]
+    57 0000007B 0F05                    syscall
+    58                                 
+    59                                 
+    60                                 
+    61                                 
+    62 0000007D 4D31FF                  xor r15, r15
+    63 00000080 4D31DB                  xor r11, r11
+    64 00000083 4D31D2                  xor r10, r10
+    65                                 a2d:
+    66 00000086 4180BF[00000000]0A      cmp byte[shiftdegree+r15], 10
+    67 0000008E 7419                    je a2dend
+    68                                 
+    69 00000090 B800000000              mov eax, 0
+    70 00000095 418A87[00000000]        mov al, byte[shiftdegree+r15]
+    71                                 
+    72 0000009C 2C30                    sub al, '0'
+    73 0000009E 4D6BD20A                imul r10, 10
+    74 000000A2 4100C2                  add r10b, al
+    75                                 
+    76 000000A5 4983C701                add r15, 1
+    77 000000A9 EBD9                    jmp a2d
+    78                                 a2dend:
+    79                                 
+    80 000000AB 4C891425[00000000]      mov [dshiftdegree], r10
+    81                                 
+    82 000000B3 4D31FF                  xor r15, r15
+    83 000000B6 4D31F6                  xor r14, r14
+    84 000000B9 4D31ED                  xor r13, r13
+    85 000000BC 49C7C501000000          mov r13, 1
+    86                                 shiftloop:
+    87 000000C3 4180BF[00000000]0A      cmp byte[inpt+r15], 10
+    88 000000CB 0F84A0010000            je shiftloopend
+    89                                 
+    90 000000D1 49C7C600000000          mov r14, 0
+    91 000000D8 458AB7[00000000]        mov r14b, byte[inpt+r15]
+    92                                 
+    93 000000DF 4180FE20                cmp r14b, ' '
+    94 000000E3 7524                    jnz next1
+    95                                 
+    96 000000E5 44883425[00000000]      mov [out1], r14b
+    97 000000ED B801000000              mov eax,1
+    98 000000F2 BF01000000              mov edi,1
+    99 000000F7 BA01000000              mov edx, 1
+   100 000000FC 488D3425[00000000]      lea rsi, [out1]
+   101 00000104 0F05                    syscall
+   102 00000106 E95E010000              jmp skipspecialchar
+   103                                 
+   104                                 next1:
+   105 0000010B 4180FE21                cmp r14b, '!'
+   106 0000010F 7524                    jnz next2
+   107                                 
+   108 00000111 44883425[00000000]      mov [out1], r14b
+   109 00000119 B801000000              mov eax,1
+   110 0000011E BF01000000              mov edi,1
+   111 00000123 BA01000000              mov edx, 1
+   112 00000128 488D3425[00000000]      lea rsi, [out1]
+   113 00000130 0F05                    syscall
+   114 00000132 E932010000              jmp skipspecialchar
+   115                                 
+   116                                 next2:
+   117 00000137 4180FE3F                cmp r14b, '?'
+   118 0000013B 7524                    jnz next3
+   119                                 
+   120 0000013D 44883425[00000000]      mov [out1], r14b
+   121 00000145 B801000000              mov eax,1
+   122 0000014A BF01000000              mov edi,1
+   123 0000014F BA01000000              mov edx, 1
+   124 00000154 488D3425[00000000]      lea rsi, [out1]
+   125 0000015C 0F05                    syscall
+   126 0000015E E906010000              jmp skipspecialchar
+   127                                 
+   128                                 next3:
+   129 00000163 4180FE2E                cmp r14b, '.'
+   130 00000167 7524                    jnz next4
+   131                                 
+   132 00000169 44883425[00000000]      mov [out1], r14b
+   133 00000171 B801000000              mov eax,1
+   134 00000176 BF01000000              mov edi,1
+   135 0000017B BA01000000              mov edx, 1
+   136 00000180 488D3425[00000000]      lea rsi, [out1]
+   137 00000188 0F05                    syscall
+   138 0000018A E9DA000000              jmp skipspecialchar
+   139                                 
+   140                                 next4:
+   141 0000018F 4180FE2C                cmp r14b, ','
+   142 00000193 7524                    jnz shiftit
+   143                                 
+   144 00000195 44883425[00000000]      mov [out1], r14b
+   145 0000019D B801000000              mov eax,1
+   146 000001A2 BF01000000              mov edi,1
+   147 000001A7 BA01000000              mov edx, 1
+   148 000001AC 488D3425[00000000]      lea rsi, [out1]
+   149 000001B4 0F05                    syscall
+   150 000001B6 E9AE000000              jmp skipspecialchar
+   151                                 
+   152                                 
+   153                                 shiftit:
+   154                                 
+   155                                 
+   156 000001BB 4983FD01                cmp r13, 1
+   157 000001BF 7C44                    jl subshift
+   158                                 
+   159 000001C1 4831D2                  xor rdx, rdx
+   160 000001C4 4C89F2                  mov rdx, r14
+   161 000001C7 4883EA41                sub rdx, 'A'
+   162 000001CB 4883FA19                cmp rdx, 'Z'-'A'
+   163 000001CF 7619                    jbe rbig
+   164                                 
+   165 000001D1 4C033425[00000000]      add r14, [dshiftdegree]
+   166 000001D9 4983FE7A                cmp r14, 'z'
+   167 000001DD 7E02                    jle underz
+   168 000001DF 4983EE1A                sub r14, 26
+   169                                 
+   170                                 underz:
+   171 000001E3 49C7C500000000          mov r13, 0
+   172                                 
+   173 000001EA EB5F                    jmp printit
+   174                                 
+   175                                 rbig:
+   176 000001EC 4C033425[00000000]      add r14, [dshiftdegree]
+   177 000001F4 4983FE5A                cmp r14, 'Z'
+   178 000001F8 7E02                    jle bigunderz
+   179 000001FA 4983EE1A                sub r14, 26
+   180                                 
+   181                                  bigunderz:
+   182 000001FE 49C7C500000000          mov r13, 0
+   183                                 
+   184 00000205 EB44                    jmp printit
+   185                                 
+   186                                 
+   187                                 
+   188                                 subshift:
+   189                                 
+   190 00000207 4831D2                  xor rdx, rdx
+   191 0000020A 4C89F2                  mov rdx, r14
+   192 0000020D 4883EA41                sub rdx, 'A'
+   193 00000211 4883FA19                cmp rdx, 'Z'-'A'
+   194 00000215 7619                    jbe lbig
+   195                                 
+   196 00000217 4C2B3425[00000000]      sub r14, [dshiftdegree]
+   197 0000021F 4983FE61                cmp r14, 'a'
+   198 00000223 7D02                    jge abovea
+   199                                 
+   200 00000225 4983C61A                add r14, 26
+   201                                 
+   202                                 abovea:
+   203                                 
+   204 00000229 49C7C501000000          mov r13, 1
+   205 00000230 EB19                    jmp printit
+   206                                 
+   207                                 lbig:
+   208 00000232 4C2B3425[00000000]      sub r14, [dshiftdegree]
+   209 0000023A 4983FE41                cmp r14, 'A'
+   210 0000023E 7D02                    jge bigabovea
+   211                                 
+   212 00000240 4983C61A                add r14, 26
+   213                                 
+   214                                 bigabovea:
+   215                                 
+   216 00000244 49C7C501000000          mov r13, 1
+   217 0000024B EBFE                    jmp printit
+   218                                 
+   219                                 
+   220                                 printit:
+   221 0000024D 4C893425[00000000]      mov [out1], r14
+   222 00000255 B801000000              mov eax,1
+   223 0000025A BF01000000              mov edi,1
+   224 0000025F BA01000000              mov edx, 1
+   225 00000264 488D3425[00000000]      lea rsi, [out1]
+   226 0000026C 0F05                    syscall
+   227                                 
+   228                                 skipspecialchar:
+   229 0000026E 4983C701                add r15, 1
+   230 00000272 E947FEFFFF              jmp shiftloop
+   231                                 shiftloopend:
+   232                                 
+   233                                 
+   234 00000277 E9D1000000              jmp skipo
+   235                                 
+   236                                 
+   237                                 
+   238 0000027C 4831C0                  xor rax, rax
+   239 0000027F 4831D2                  xor rdx, rdx
+   240 00000282 4831C9                  xor rcx, rcx
+   241 00000285 4D31E4                  xor r12, r12
+   242 00000288 4C89D0                  mov rax, r10
+   243                                 cloop:
+   244 0000028B 4883F800                cmp rax, 0
+   245 0000028F 7406                    je cloopend
+   246                                 
+   247 00000291 4901C4                  add r12, rax
+   248 00000294 48FFC8                  dec rax
+   249                                 
+   250 00000297 EBF0                    jmp cloop
+   251                                 cloopend:
+   252                                 
+   253                                 
+   254                                 
+   255                                 
+   256 00000299 4831C0                  xor rax,rax
+   257 0000029C 4831DB                  xor rbx,rbx
+   258 0000029F 4831C9                  xor rcx,rcx
+   259 000002A2 4831D2                  xor rdx,rdx
+   260 000002A5 4D31D2                  xor r10, r10
+   261 000002A8 4D31DB                  xor r11, r11
+   262                                 
+   263 000002AB 4C89E0                  mov rax, r12
+   264 000002AE 49BA000064A7B3B6E0-     mov r10, 1000000000000000000
+   265 000002AE 0D                 
+   266                                 
+   267                                 divloop:
+   268 000002B8 4831C0                  xor rax,rax
+   269 000002BB 4831DB                  xor rbx,rbx
+   270 000002BE 4831C9                  xor rcx,rcx
+   271 000002C1 4831D2                  xor rdx,rdx
+   272                                 
+   273 000002C4 4C89E0                  mov rax, r12
+   274 000002C7 4C89D1                  mov rcx, r10
+   275                                 
+   276 000002CA 48F7F9                  idiv rcx
+   277                                 
+   278 000002CD 4883F800                cmp rax, 0
+   279 000002D1 7F1C                    jg divloopend
+   280                                 
+   281 000002D3 4831C0                  xor rax,rax
+   282 000002D6 4831DB                  xor rbx,rbx
+   283 000002D9 4831C9                  xor rcx,rcx
+   284 000002DC 4831D2                  xor rdx,rdx
+   285                                 
+   286 000002DF 4C89D0                  mov rax, r10
+   287 000002E2 48C7C10A000000          mov rcx, 10
+   288                                 
+   289 000002E9 48F7F9                  idiv rcx
+   290                                 
+   291 000002EC 4989C2                  mov r10, rax
+   292                                 
+   293 000002EF EBC5                    jmp divloop
+   294                                 divloopend:
+   295                                 
+   296                                 
+   297                                 outloop:
+   298 000002F1 4983FA01                cmp r10, 1
+   299 000002F5 7E59                    jle outloopend
+   300                                 
+   301 000002F7 4831C0                  xor rax,rax
+   302 000002FA 4831DB                  xor rbx,rbx
+   303 000002FD 4831C9                  xor rcx,rcx
+   304 00000300 4831D2                  xor rdx,rdx
+   305                                 
+   306 00000303 4C89E0                  mov rax, r12
+   307 00000306 4C89D1                  mov rcx, r10
+   308                                 
+   309 00000309 48F7F9                  idiv rcx
+   310                                 
+   311 0000030C 4989D4                  mov r12, rdx
+   312                                 
+   313                                 
+   314                                 
+   315 0000030F 4883C030                add rax, '0'
+   316                                 
+   317 00000313 48890425[00000000]      mov [res1], rax
+   318 0000031B B801000000              mov eax,1
+   319 00000320 BF01000000              mov edi,1
+   320 00000325 BA01000000              mov edx, 1
+   321 0000032A 488D3425[00000000]      lea rsi, [res1]
+   322 00000332 0F05                    syscall
+   323                                 
+   324 00000334 4831C0                  xor rax,rax
+   325 00000337 4831DB                  xor rbx,rbx
+   326 0000033A 4831C9                  xor rcx,rcx
+   327 0000033D 4831D2                  xor rdx,rdx
+   328                                 
+   329 00000340 4C89D0                  mov rax, r10
+   330 00000343 48C7C10A000000          mov rcx, 10
+   331                                 
+   332 0000034A 48F7F9                  idiv rcx
+   333                                 
+   334 0000034D 4989C2                  mov r10, rax
+   335                                 
+   336 00000350 EB9D                    jmp outloop
+   337                                 outloopend:
+   338                                 
+   339                                 skipo:
+   340                                 
+   341                                 
+   342 00000352 B801000000              mov eax,1
+   343 00000357 BF01000000              mov edi,1
+   344 0000035C BA01000000              mov edx, 1
+   345 00000361 488D3425[00000000]      lea rsi, [endl]
+   346 00000369 0F05                    syscall
+   347                                 
+   348                                 
+   349 0000036B B83C000000              mov eax,60
+   350 00000370 31FF                    xor edi, edi
+   351 00000372 0F05                    syscall

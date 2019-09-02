@@ -1,10 +1,10 @@
 make: go
 
-mul.o:  mul.asm
-		yasm -f elf64 -g dwarf2 -l mul.lst mul.asm
+basicCaesar.o:  basicCaesar.asm
+		yasm -f elf64 -g dwarf2 -l basicCaesar.lst basicCaesar.asm
 
-go:   mul.o
-		ld -o mul mul.o
+go:   basicCaesar.o
+		ld -o basicCaesar basicCaesar.o
 
 run: 
-		./mul <input> output
+		./basicCaesar <input> output

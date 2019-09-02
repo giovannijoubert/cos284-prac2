@@ -7,4 +7,4 @@ go:   task2.o
 		ld -o task2 task2.o
 
 run: 
-		./task2
+		./task2 <input> output

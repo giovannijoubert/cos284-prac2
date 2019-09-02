@@ -1,49 +1,107 @@
      1                                 %line 1+1 task1.asm
      2                                 [segment .data]
-     3 00000000 506C6561736520696E-     init: db "Please input your student number: ",0x0a
-     4 00000000 70757420796F757220-
-     5 00000000 73747564656E74206E-
-     6 00000000 756D6265723A200A   
-     7 00000023 596F75722073747564-     msg: db "Your student number is: u",0x0a
-     8 00000023 656E74206E756D6265-
-     9 00000023 722069733A20750A   
-    10 0000003D 0A                      endl: db "",0x0a
-    11                                 [segment .bss]
-    12 00000000 <gap>                   inpt: resb 8
-    13                                 [segment .text]
-    14                                 [global _start]
-    15                                 _start:
-    16 00000000 B801000000              mov eax,1
-    17 00000005 BF01000000              mov edi,1
-    18 0000000A BA22000000              mov edx, 34
-    19 0000000F 488D3425[00000000]      lea rsi,[init]
-    20 00000017 0F05                    syscall
-    21                                 
-    22 00000019 B800000000              mov eax,0
-    23 0000001E BF00000000              mov edi,0
-    24 00000023 BA08000000              mov edx, 8
-    25 00000028 488D3425[00000000]      lea rsi,[inpt]
-    26 00000030 0F05                    syscall
-    27                                 
-    28 00000032 B801000000              mov eax,1
-    29 00000037 BF01000000              mov edi,1
-    30 0000003C BA19000000              mov edx, 25
-    31 00000041 488D3425[00000000]      lea rsi,[msg]
-    32 00000049 0F05                    syscall
-    33                                 
-    34 0000004B B801000000              mov eax,1
-    35 00000050 BF01000000              mov edi,1
-    36 00000055 BA08000000              mov edx, 8
-    37 0000005A 488D3425[00000000]      lea rsi,[inpt]
-    38 00000062 0F05                    syscall
+     3 00000000 506C6561736520656E-     init: db "Please enter a string: ",0x0a
+     4 00000000 746572206120737472-
+     5 00000000 696E673A200A       
+     6 00000018 546865206C656E6774-     msg: db "The length of the string is: ",0x0a
+     7 00000018 68206F662074686520-
+     8 00000018 737472696E67206973-
+     9 00000018 3A200A             
+    10 00000036 0A                      endl: db "",0x0a
+    11 00000037 00                      count: db 0
+    12                                 [segment .bss]
+    13 00000000 <gap>                   res1: resb 1
+    14 00000001 <gap>                   res2: resb 1
+    15 00000002 <gap>                   inpt: resb 8
+    16                                 [segment .text]
+    17                                 [global _start]
+    18                                 _start:
+    19 00000000 B801000000              mov eax,1
+    20 00000005 BF01000000              mov edi,1
+    21 0000000A BA17000000              mov edx, 23
+    22 0000000F 488D3425[00000000]      lea rsi,[init]
+    23 00000017 0F05                    syscall
+    24                                 
+    25 00000019 B800000000              mov eax,0
+    26 0000001E BF00000000              mov edi,0
+    27 00000023 BAC8000000              mov edx, 200
+    28 00000028 488D3425[00000000]      lea rsi,[inpt]
+    29 00000030 0F05                    syscall
+    30                                 
+    31 00000032 B801000000              mov eax,1
+    32 00000037 BF01000000              mov edi,1
+    33 0000003C BA1D000000              mov edx, 29
+    34 00000041 488D3425[00000000]      lea rsi,[msg]
+    35 00000049 0F05                    syscall
+    36                                 
+    37 0000004B 4831DB                  xor rbx,rbx
+    38 0000004E 48C7C300000000          mov rbx, 0
     39                                 
-    40 00000064 B801000000              mov eax,1
-    41 00000069 BF01000000              mov edi,1
-    42 0000006E BA01000000              mov edx, 1
-    43 00000073 488D3425[00000000]      lea rsi, [endl]
-    44 0000007B 0F05                    syscall
+    40 00000055 4831C0                  xor rax, rax
+    41 00000058 488B0425[00000000]      mov rax, [inpt]
+    42                                 
+    43                                 
+    44 00000060 48C7C300000000          mov rbx, 0
     45                                 
     46                                 
-    47 0000007D B83C000000              mov eax,60
-    48 00000082 31FF                    xor edi, edi
-    49 00000084 0F05                    syscall
+    47                                 lop:
+    48                                 
+    49 00000067 8A83[00000000]          mov al, [inpt + rbx]
+    50 0000006D 3C00                    cmp al, 0
+    51 0000006F 7403                    je endlop
+    52                                 
+    53                                 
+    54                                 
+    55                                 
+    56                                 
+    57 00000071 48FFC3                  inc rbx
+    58 00000074 EBEF                    jmp lop
+    59                                 endlop:
+    60                                 
+    61 00000076 48FFCB                  dec rbx
+    62                                 
+    63 00000079 48C7C000000000          mov rax, 0
+    64 00000080 4889D8                  mov rax, rbx
+    65                                 
+    66 00000083 48C7C300000000          mov rbx, 0
+    67                                 
+    68 0000008A 48C7C200000000          mov rdx, 0
+    69 00000091 66B90A00                mov cx, 10
+    70 00000095 66F7F9                  idiv cx
+    71 00000098 4989C1                  mov r9, rax
+    72 0000009B 4989D2                  mov r10, rdx
+    73                                 
+    74                                 
+    75 0000009E 4983C130                add r9, '0'
+    76 000000A2 4983C230                add r10, '0'
+    77                                 
+    78                                 
+    79 000000A6 4C890C25[00000000]      mov [res1], r9
+    80 000000AE 4C891425[00000000]      mov [res2], r10
+    81                                 
+    82 000000B6 4983E930                sub r9, '0'
+    83 000000BA 4983F900                cmp r9, 0
+    84 000000BE 7417                    jz skip
+    85 000000C0 B801000000              mov eax,1
+    86 000000C5 BF01000000              mov edi,1
+    87 000000CA BA01000000              mov edx, 1
+    88 000000CF 488D3425[00000000]      lea rsi,[res1]
+    89 000000D7 0F05                    syscall
+    90                                 
+    91                                 skip:
+    92 000000D9 B801000000              mov eax,1
+    93 000000DE BF01000000              mov edi,1
+    94 000000E3 BA01000000              mov edx, 1
+    95 000000E8 488D3425[00000000]      lea rsi,[res2]
+    96 000000F0 0F05                    syscall
+    97                                 
+    98 000000F2 B801000000              mov eax,1
+    99 000000F7 BF01000000              mov edi,1
+   100 000000FC BA01000000              mov edx, 1
+   101 00000101 488D3425[00000000]      lea rsi, [endl]
+   102 00000109 0F05                    syscall
+   103                                 
+   104                                 
+   105 0000010B B83C000000              mov eax,60
+   106 00000110 31FF                    xor edi, edi
+   107 00000112 0F05                    syscall
